@@ -1,0 +1,12 @@
+/Users/hafht/Documents/workspaces/lighthouse-app-netservices/Kelvin.Services.Static/bin/Debug/net6.0/Kelvin.Services.Static.deps.json
+/Users/hafht/Documents/workspaces/lighthouse-app-netservices/Kelvin.Services.Static/bin/Debug/net6.0/Kelvin.Services.Static.dll
+/Users/hafht/Documents/workspaces/lighthouse-app-netservices/Kelvin.Services.Static/bin/Debug/net6.0/Kelvin.Services.Static.pdb
+/Users/hafht/Documents/workspaces/lighthouse-app-netservices/Kelvin.Services.Static/obj/Debug/net6.0/Kelvin.Services.Static.csproj.AssemblyReference.cache
+/Users/hafht/Documents/workspaces/lighthouse-app-netservices/Kelvin.Services.Static/obj/Debug/net6.0/Kelvin.Services.Static.GeneratedMSBuildEditorConfig.editorconfig
+/Users/hafht/Documents/workspaces/lighthouse-app-netservices/Kelvin.Services.Static/obj/Debug/net6.0/Kelvin.Services.Static.AssemblyInfoInputs.cache
+/Users/hafht/Documents/workspaces/lighthouse-app-netservices/Kelvin.Services.Static/obj/Debug/net6.0/Kelvin.Services.Static.AssemblyInfo.cs
+/Users/hafht/Documents/workspaces/lighthouse-app-netservices/Kelvin.Services.Static/obj/Debug/net6.0/Kelvin.Services.Static.csproj.CoreCompileInputs.cache
+/Users/hafht/Documents/workspaces/lighthouse-app-netservices/Kelvin.Services.Static/obj/Debug/net6.0/Kelvin.Services.Static.dll
+/Users/hafht/Documents/workspaces/lighthouse-app-netservices/Kelvin.Services.Static/obj/Debug/net6.0/refint/Kelvin.Services.Static.dll
+/Users/hafht/Documents/workspaces/lighthouse-app-netservices/Kelvin.Services.Static/obj/Debug/net6.0/Kelvin.Services.Static.pdb
+/Users/hafht/Documents/workspaces/lighthouse-app-netservices/Kelvin.Services.Static/obj/Debug/net6.0/ref/Kelvin.Services.Static.dll

@@ -1,0 +1,12 @@
+/Users/hafht/Documents/workspaces/lighthouse-app-netservices/Kelvin.Services.Data/bin/Debug/net6.0/Kelvin.Services.Data.deps.json
+/Users/hafht/Documents/workspaces/lighthouse-app-netservices/Kelvin.Services.Data/bin/Debug/net6.0/Kelvin.Services.Data.dll
+/Users/hafht/Documents/workspaces/lighthouse-app-netservices/Kelvin.Services.Data/bin/Debug/net6.0/Kelvin.Services.Data.pdb
+/Users/hafht/Documents/workspaces/lighthouse-app-netservices/Kelvin.Services.Data/obj/Debug/net6.0/Kelvin.Services.Data.csproj.AssemblyReference.cache
+/Users/hafht/Documents/workspaces/lighthouse-app-netservices/Kelvin.Services.Data/obj/Debug/net6.0/Kelvin.Services.Data.GeneratedMSBuildEditorConfig.editorconfig
+/Users/hafht/Documents/workspaces/lighthouse-app-netservices/Kelvin.Services.Data/obj/Debug/net6.0/Kelvin.Services.Data.AssemblyInfoInputs.cache
+/Users/hafht/Documents/workspaces/lighthouse-app-netservices/Kelvin.Services.Data/obj/Debug/net6.0/Kelvin.Services.Data.AssemblyInfo.cs
+/Users/hafht/Documents/workspaces/lighthouse-app-netservices/Kelvin.Services.Data/obj/Debug/net6.0/Kelvin.Services.Data.csproj.CoreCompileInputs.cache
+/Users/hafht/Documents/workspaces/lighthouse-app-netservices/Kelvin.Services.Data/obj/Debug/net6.0/Kelvin.Services.Data.dll
+/Users/hafht/Documents/workspaces/lighthouse-app-netservices/Kelvin.Services.Data/obj/Debug/net6.0/refint/Kelvin.Services.Data.dll
+/Users/hafht/Documents/workspaces/lighthouse-app-netservices/Kelvin.Services.Data/obj/Debug/net6.0/Kelvin.Services.Data.pdb
+/Users/hafht/Documents/workspaces/lighthouse-app-netservices/Kelvin.Services.Data/obj/Debug/net6.0/ref/Kelvin.Services.Data.dll

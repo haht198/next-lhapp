@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="6.0.0" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+        <PackageReference Include="Serilog" Version="2.8.0" />
+        <PackageReference Include="Serilog.Exceptions" Version="5.0.0" />
+        <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
+        <PackageReference Include="System.Net.Security" Version="4.3.2" />
+        <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
+        <PackageReference Include="Microsoft.CSharp" Version="4.6.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Remove="socket-setting.json" />
+    </ItemGroup>
+    <ItemGroup>
+        <None Update="application-setting.dev.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="application-setting.prod.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="application-setting %28copy%29.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\Common.Services.Static\Common.Services.Static.csproj" />
+    </ItemGroup>
+
+    <ProjectExtensions>
+        <VisualStudio>
+            <UserProperties application-setting_1sandbox_1json__JSONSchema="http://json.schemastore.org/bozr" />
+        </VisualStudio>
+    </ProjectExtensions>
+
+</Project>
