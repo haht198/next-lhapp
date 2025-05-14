@@ -1,0 +1,25 @@
+{
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug Desktop",
+      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+      "windows": {
+          "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd"
+      },
+      "program": "${workspaceFolder}/dist/apps/desktop/main.js",
+      "outputCapture": "std",
+      "preLaunchTask": "build_and_debug_desktop",
+      "postDebugTask": "terminate_debug_session",
+      "args": [
+          "--serve",
+          "--env=debug",
+          "--app=hue",
+          "--inspect"
+      ]
+    }
+  ]
+}
