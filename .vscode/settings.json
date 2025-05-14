@@ -1,0 +1,7 @@
+{
+    "nxConsole.generateAiAgentRules": true,
+    "files.exclude": {
+      "**/netcore-services": true,
+      "node_modules": true,
+    }
+}
