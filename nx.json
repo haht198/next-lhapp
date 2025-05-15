@@ -44,6 +44,11 @@
     },
     "e2e-ci--**/**": {
       "dependsOn": ["^build"]
+    },
+    "@nx/js:tsc": {
+      "cache": true,
+      "dependsOn": ["^build"],
+      "inputs": ["production", "^production"]
     }
   },
   "plugins": [
@@ -68,5 +73,10 @@
       "unitTestRunner": "jest"
     }
   },
-  "defaultProject": "desktop"
+  "defaultProject": "desktop",
+  "release": {
+    "version": {
+      "preVersionCommand": "npx nx run-many -t build"
+    }
+  }
 }

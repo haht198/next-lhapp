@@ -3,7 +3,7 @@ import { rendererAppName, rendererAppPort } from './constants';
 import { environment } from '../environments/environment';
 import { join } from 'path';
 import { format } from 'url';
-
+import { bootstrapApplicaion } from '@creative-force/electron-core';
 export default class App {
   // Keep a global reference of the window object, if you don't, the window will
   // be closed automatically when the JavaScript object is garbage collected.
@@ -45,6 +45,10 @@ export default class App {
     // initialization and is ready to create browser windows.
     // Some APIs can only be used after this event occurs.
     if (rendererAppName) {
+      bootstrapApplicaion({
+        appName: rendererAppName,
+        appPort: rendererAppPort,
+      });
       App.initMainWindow();
       App.loadMainWindow();
     }

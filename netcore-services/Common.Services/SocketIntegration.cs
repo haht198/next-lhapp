@@ -55,7 +55,7 @@ namespace Common.Services
             var result = socket.OpenAsync().GetAwaiter().GetResult();
             if (!result)
             {
-                Logger.Warning($"{LogPrefix()} - Cannot connect socket chanel {_chanelIdentifier} to main socket, application will exit {result}");
+                Logger.Warning($"{LogPrefix()} - Cannot connect socket chanel {_chanelIdentifier} to main socket, application will exit.");
                 Program.Stop();
                 return result;
             }

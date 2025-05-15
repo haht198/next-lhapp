@@ -32,7 +32,7 @@ namespace Common.Services.Worker
             {
               Console.WriteLine("[Uploader] Handler socket data", socketData);
               // Mock return data
-              SocketIntegration.Send(SocketEvents.FinishUpload, "v1.0.0");
+              SocketIntegration.Send(SocketEvents.FinishUpload, "FINISH_UPLOAD_RESULT_v1.0.0");
             });
         }
 
