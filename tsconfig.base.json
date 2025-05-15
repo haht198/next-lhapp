@@ -15,7 +15,8 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@creative-force/electron-core": ["libs/main/core/src/index.ts"]
+      "@creative-force/electron-core": ["libs/main/core/src/index.ts"],
+      "@next-lhapp/builder-services": ["plugins/builder-services/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

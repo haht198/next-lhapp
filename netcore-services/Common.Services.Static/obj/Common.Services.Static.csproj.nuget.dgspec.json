@@ -5,7 +5,7 @@
   },
   "projects": {
     "/Users/haht/Documents/Workspace/test/next-lhapp/netcore-services/Common.Services.Static/Common.Services.Static.csproj": {
-      "version": "1.0.0",
+      "version": "1.1.1",
       "restore": {
         "projectUniqueName": "/Users/haht/Documents/Workspace/test/next-lhapp/netcore-services/Common.Services.Static/Common.Services.Static.csproj",
         "projectName": "Common.Services.Static",
@@ -91,12 +91,27 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Runtime.osx-arm64",
+              "version": "[8.0.16, 8.0.16]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Runtime.osx-arm64",
+              "version": "[8.0.16, 8.0.16]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/Users/haht/.dotnet/sdk/8.0.406/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.409/PortableRuntimeIdentifierGraph.json"
+        }
+      },
+      "runtimes": {
+        "osx-arm64": {
+          "#import": []
         }
       }
     }

@@ -1,0 +1,80 @@
+{
+  "name": "builder",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/builder/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nx/esbuild:esbuild",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "platform": "node",
+        "outputPath": "dist/apps/builder",
+        "format": ["cjs"],
+        "bundle": false,
+        "main": "apps/builder/src/main.ts",
+        "tsConfig": "apps/builder/tsconfig.app.json",
+        "assets": [{
+          "glob": "**/*",
+          "input": "apps/builder/src/resources",
+          "output": "resources"
+        }],
+        "generatePackageJson": true,
+        "esbuildOptions": {
+          "sourcemap": true,
+          "outExtension": {
+            ".js": ".js"
+          }
+        }
+      },
+      "configurations": {
+        "development": {},
+        "production": {
+          "esbuildOptions": {
+            "sourcemap": false,
+            "outExtension": {
+              ".js": ".js"
+            }
+          }
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "dependsOn": ["build"],
+      "options": {
+        "buildTarget": "builder:build",
+        "runBuildTargetDependencies": false
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "builder:build:development"
+        },
+        "production": {
+          "buildTarget": "builder:build:production"
+        }
+      }
+    },
+    "preview": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "dependsOn": ["build"],
+      "options": {
+        "buildTarget": "builder:build",
+        "runBuildTargetDependencies": false,
+        "watch": false
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "builder:build:development"
+        },
+        "production": {
+          "buildTarget": "builder:build:production"
+        }
+      }
+    }
+  },
+  "tags": []
+}

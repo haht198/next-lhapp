@@ -1,7 +1,8 @@
 {
-    "nxConsole.generateAiAgentRules": true,
-    "files.exclude": {
-      "**/netcore-services": true,
-      "node_modules": true,
-    }
+  "nxConsole.generateAiAgentRules": true,
+  "files.exclude": {
+    "**/netcore-services": true,
+    "node_modules": true
+  },
+  "eslint.validate": ["json"]
 }

@@ -37,7 +37,8 @@ namespace Common.Services
             var version = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
             var fileVersion = assembly.GetCustomAttribute<AssemblyFileVersionAttribute>().Version;
             var assemblyVersion = assembly.GetName().Version.ToString();
-
+            var versionSuffix = version.Contains("-") ? version.Split('-')[1] : "release";
+            Console.WriteLine($"Version Suffix: {versionSuffix}");
             Console.WriteLine($"Informational Version: {version}");
             Console.WriteLine($"File Version: {fileVersion}");
             Console.WriteLine($"Assembly Version: {assemblyVersion}");
