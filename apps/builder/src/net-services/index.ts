@@ -11,6 +11,7 @@ import { BuildInfo } from '../models/build-info';
 import { executeCommand } from '../utils/shell';
 import { dotnetCommans } from './command';
 import { SigningService } from './signing';
+import { zipFolder } from '../utils/fs';
 
 export interface NetServiceConfig {
   name: string;
@@ -66,6 +67,7 @@ export class NetServicesBuilder {
     // log command
     await executeCommand(`dotnet --info`);
     const needSignFiles = [];
+    let signResult = true;
     for (const service of this.config.services) {
       const result = await this.build(service, this.config.deployDir);
       if (!result) {
@@ -79,8 +81,23 @@ export class NetServicesBuilder {
       }
       console.log(`[NetServicesBuilder] - Build: Need sign files: ${needSignFiles}`);
       if (needSignFiles.length > 0) {
-        await SigningService.signFiles(needSignFiles);
+        signResult = await SigningService.signFiles(needSignFiles);
       }
+      if (!signResult) {
+        throw new Error(
+          `[NetServicesBuilder] - Publish failed: Code sign failed`
+        );
+      }
+      console.log(`[NetServicesBuilder] - Publish: Code sign result: ${signResult} ✅`);
+      const zipFilePath = path.join(this.config.deployDir, `${this.getPublishServiceName()}.zip`);
+      console.log(`[NetServicesBuilder] - Compress publish files into zip file: ${zipFilePath}`);
+      const zipResult = await zipFolder(this.config.deployDir, zipFilePath);
+      if (!zipResult) {
+        throw new Error(
+          `[NetServicesBuilder] - Publish failed: Zip failed`
+        );
+      }
+      console.log(`[NetServicesBuilder] - Publish: Zip file: ${zipFilePath} ✅`);
     }
   }
 
@@ -242,6 +259,12 @@ export class NetServicesBuilder {
     const projectContent = readFileSync(projectFile, 'utf8');
     const versionMatch = projectContent.match(/<Version>(.*?)<\/Version>/);
     this.projectVersion = versionMatch ? versionMatch[1] : '0.0.1';
+  }
+  private getPublishServiceName() {
+    if(!this.tempBuildInfo) {
+        return 'unknown';
+    }
+    return `common-services_${platform()}_${this.tempBuildInfo.version}_${this.tempBuildInfo.build}`;
   }
 
   private async testListVersions() {

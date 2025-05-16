@@ -35,9 +35,11 @@ export class SigningService {
             throw new Error(`[SigningService][${_platform}] - Signing file: ${file} failed with code ${code}`);
            }
            console.log(`[SigningService][${_platform}] - Signing file: ${file} - result: ${code} ✅`);
+           return true;
         }
        } catch (error) {
         console.error(error);
+        return false;
        }
     }
 
