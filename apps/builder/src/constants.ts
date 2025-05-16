@@ -1,0 +1,1 @@
+export const S3_RELEASE_APP_BUCKET = 'download.creativeforce-dev.io';

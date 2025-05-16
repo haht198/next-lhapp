@@ -6399,7 +6399,7 @@
     "/Users/haht/.nuget/packages/": {}
   },
   "project": {
-    "version": "1.1.1",
+    "version": "1.0.0",
     "restore": {
       "projectUniqueName": "/Users/haht/Documents/Workspace/test/next-lhapp/netcore-services/Common.Services.Static/Common.Services.Static.csproj",
       "projectName": "Common.Services.Static",
