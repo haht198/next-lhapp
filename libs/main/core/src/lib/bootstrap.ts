@@ -1,6 +1,7 @@
 import { NetService } from './net-service';
 import { Application } from './static';
 import Logger, { LogConfig } from '@creative-force/eslogger';
+import { bootstrapElectronEvents } from './events/electron.event';
 
 export interface ApplicationConfig {
   appName: string;
@@ -12,12 +13,16 @@ export const bootstrapApplication = (config: ApplicationConfig) => {
   Logger.info('[Core] Bootstrap application', config);
   LogConfig.useConsole();
   Application.initState();
+  bootstrapElectronEvents();
 
   // Init net services
   NetService.bootstrap();
   const _end = performance.now();
   Application.isBootstrapped = true;
-  Logger.info(`[Core] Bootstrap application time: ${_end - _start}ms`);
+  Application.bootstrapTime = _end - _start;
+  Logger.info(
+    `[Core] Bootstrap application time: ${Application.bootstrapTime}ms`
+  );
 };
 
 // Bootstrap application flow

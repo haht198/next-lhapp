@@ -1,10 +1,34 @@
-import { Component } from "@angular/core";
+import { Component, OnDestroy, OnInit, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { CFRendererIPCEvent } from '@creative-force/electron-core/preload';
+
+interface ElectronCore {
+  getApplicationState(): Promise<ApplicationState>;
+  onApplicationStateChange(
+    callback: (state: ApplicationState) => void
+  ): CFRendererIPCEvent;
+}
+
+interface ApplicationState {
+  isReady?: boolean;
+  version?: string;
+  platform?: string;
+  bootstrapTime: number;
+  [key: string]: any;
+}
+
+declare global {
+  interface Window {
+    electronCore: ElectronCore;
+  }
+}
 
 @Component({
-  selector: "app-project",
+  selector: 'app-project',
   template: `
     <div class="project-page">
-      <h1>Project Page</h1>
+      <h1>Application State</h1>
+      <pre>{{ applicationState() | json }}</pre>
     </div>
   `,
   styles: [
@@ -25,11 +49,44 @@ import { Component } from "@angular/core";
         font-size: 16px;
         line-height: 1.5;
       }
-    `
+    `,
   ],
   standalone: true,
-  imports: []
+  imports: [CommonModule],
 })
-export class ProjectComponent {
+export class ProjectComponent implements OnInit, OnDestroy {
+  applicationState = signal<ApplicationState>({
+    isReady: false,
+    version: '',
+    platform: '',
+    bootstrapTime: 0,
+  });
 
+  private _subscription: CFRendererIPCEvent | null = null;
+
+  ngOnInit() {
+    window.electronCore
+      .getApplicationState()
+      .then((state: ApplicationState) => {
+        console.log(state);
+        this.applicationState.set(state);
+      });
+
+    this._subscription = window.electronCore.onApplicationStateChange(
+      (newData: ApplicationState) => {
+        console.log('onApplicationStateChange', newData);
+
+        this.applicationState.update((state) => ({
+          ...state,
+          ...newData,
+        }));
+      }
+    );
+  }
+
+  ngOnDestroy() {
+    if (this._subscription) {
+      this._subscription.unsubscribe();
+    }
+  }
 }

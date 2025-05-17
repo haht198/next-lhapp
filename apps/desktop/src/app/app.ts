@@ -4,6 +4,7 @@ import { environment } from '../environments/environment';
 import { join } from 'path';
 import { format } from 'url';
 import { bootstrapApplication } from '@creative-force/electron-core';
+import { Application } from '@creative-force/electron-core';
 export default class App {
   // Keep a global reference of the window object, if you don't, the window will
   // be closed automatically when the JavaScript object is garbage collected.
@@ -51,6 +52,7 @@ export default class App {
       });
       App.initMainWindow();
       App.loadMainWindow();
+      Application.setMainWindow(App.mainWindow);
     }
   }
 
@@ -105,6 +107,9 @@ export default class App {
     // load the index.html of the app.
     if (!App.application.isPackaged) {
       App.mainWindow.loadURL(`http://localhost:${rendererAppPort}`);
+      setTimeout(() => {
+        App.mainWindow.webContents.openDevTools();
+      }, 1000);
     } else {
       App.mainWindow.loadURL(
         format({
