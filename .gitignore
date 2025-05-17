@@ -43,7 +43,6 @@ Thumbs.db
 
 .angular
 
-
 netcore-services/.idea/**
 .cursor/rules/nx-rules.mdc
 .github/instructions/nx.instructions.md
@@ -73,6 +72,15 @@ bld/
 [Oo]bj/
 [Ll]og/
 config.codekit3
+
+# .NET Core specific
+**/obj/**/*.cs
+**/obj/**/*.cache
+**/obj/**/*.info
+**/obj/**/*.dll
+**/obj/**/*.pdb
+**/obj/**/*.json
+
 # Visual Studio 2015 cache/options directory
 .vs/
 # Uncomment if you have tasks that create the project's static files in wwwroot
