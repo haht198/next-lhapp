@@ -4,7 +4,13 @@
   "type": "commonjs",
   "main": "./src/index.js",
   "types": "./src/index.d.ts",
+  "peerDependencies": {
+    "@creative-force/eslogger": "^1.2.0",
+    "electron": "33.4.11"
+  },
   "dependencies": {
-    "tslib": "^2.3.0"
+    "tslib": "^2.3.0",
+    "uuid": "11.1.0",
+    "ws": "8.18.2"
   }
 }
