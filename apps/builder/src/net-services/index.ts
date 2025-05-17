@@ -22,6 +22,7 @@ export interface NetServiceConfig {
 export interface NetServicesBuildConfig {
   services: NetServiceConfig[];
   deployDir: string;
+  isSkipSigning?: boolean;
 }
 
 export class NetServicesBuilder {
@@ -59,6 +60,8 @@ export class NetServicesBuilder {
     );
 
     // await this.testListVersions();
+
+    // return;
     await this.prepareBuildInfo();
 
     // process.exit(0);
@@ -75,12 +78,21 @@ export class NetServicesBuilder {
           `[NetServicesBuilder] - Start: Build failed with code ${result}`
         );
       }
-      const executable = path.join(this.config.deployDir, `${service.executeFile}`);
+      const executable = path.join(
+        this.config.deployDir,
+        `${service.executeFile}`
+      );
       if (existsSync(executable)) {
         needSignFiles.push(executable);
       }
-      console.log(`[NetServicesBuilder] - Build: Need sign files: ${needSignFiles}`);
-      if (needSignFiles.length > 0) {
+      console.log(
+        `[NetServicesBuilder] - Build: Need sign files: ${needSignFiles}`
+      );
+      if (this.config.isSkipSigning) {
+        console.log(
+          `[NetServicesBuilder] - Publish: Skip code sign because isSkipSigning is true`
+        );
+      } else if (needSignFiles.length > 0) {
         signResult = await SigningService.signFiles(needSignFiles);
       }
       if (!signResult) {
@@ -88,16 +100,71 @@ export class NetServicesBuilder {
           `[NetServicesBuilder] - Publish failed: Code sign failed`
         );
       }
-      console.log(`[NetServicesBuilder] - Publish: Code sign result: ${signResult} ✅`);
-      const zipFilePath = path.join(this.config.deployDir, `${this.getPublishServiceName()}.zip`);
-      console.log(`[NetServicesBuilder] - Compress publish files into zip file: ${zipFilePath}`);
+      console.log(
+        `[NetServicesBuilder] - Publish: Code sign result: ${signResult} ✅`
+      );
+      const zipFilePath = path.join(
+        this.config.deployDir,
+        `${this.getPublishServiceName()}.zip`
+      );
+      console.log(
+        `[NetServicesBuilder] - Compress publish files into zip file: ${zipFilePath}`
+      );
       const zipResult = await zipFolder(this.config.deployDir, zipFilePath);
       if (!zipResult) {
-        throw new Error(
-          `[NetServicesBuilder] - Publish failed: Zip failed`
-        );
+        throw new Error(`[NetServicesBuilder] - Publish failed: Zip failed`);
       }
-      console.log(`[NetServicesBuilder] - Publish: Zip file: ${zipFilePath} ✅`);
+      console.log(
+        `[NetServicesBuilder] - Publish: Zip file: ${zipFilePath} ✅`
+      );
+      // Upload zip file to s3
+      const s3Key = `released-services/dev/mac/versions/${
+        this.tempBuildInfo?.version
+      }/${path.basename(zipFilePath)}`;
+      const uploadResult = await AwsS3Client.uploadStreamFile(
+        S3_RELEASE_APP_BUCKET,
+        s3Key,
+        zipFilePath
+      );
+      console.log(
+        `[NetServicesBuilder] - Publish: Upload release service to s3: ${uploadResult}`
+      );
+      // echo download link
+      const downloadLink = `https://download.creativeforce-dev.io/${s3Key}`;
+      console.log(
+        `[NetServicesBuilder] - Publish: Download link: ${downloadLink}`
+      );
+      // upload build info to s3
+      const buildInfoS3Key = `released-services/dev/mac/versions/${this.tempBuildInfo?.version}/build-info.json`;
+      const buildInfoUploadResult = await AwsS3Client.uploadFile(
+        S3_RELEASE_APP_BUCKET,
+        buildInfoS3Key,
+        this.buildInfoFilePath
+      );
+      console.log(
+        `[NetServicesBuilder] - Publish: Upload build info to s3: ${buildInfoUploadResult}`
+      );
+      // echo build info link
+      const buildInfoLink = `https://download.creativeforce-dev.io/${buildInfoS3Key}`;
+      console.log(
+        `[NetServicesBuilder] - Publish: Build info link: ${buildInfoLink}`
+      );
+      // auto release
+      // copy build info to last-build-info.json in released-services/dev/mac folder on s3
+      const lastBuildInfoS3Key = `released-services/dev/mac/last-build-info.json`;
+      const lastBuildInfoUploadResult = await AwsS3Client.copyFile(
+        S3_RELEASE_APP_BUCKET,
+        buildInfoS3Key,
+        lastBuildInfoS3Key
+      );
+      console.log(
+        `[NetServicesBuilder] - Publish: Copy build info to last-build-info.json in released-services/dev/mac folder on s3: ${!!lastBuildInfoUploadResult}`
+      );
+      // echo last build info link
+      const lastBuildInfoLink = `https://download.creativeforce-dev.io/${lastBuildInfoS3Key}`;
+      console.log(
+        `[NetServicesBuilder] - Publish: Last build info link: ${lastBuildInfoLink}`
+      );
     }
   }
 
@@ -185,105 +252,125 @@ export class NetServicesBuilder {
   }
 
   private async prepareBuildInfo() {
-    const {content, error} = await AwsS3Client.readFile(S3_RELEASE_APP_BUCKET, 'released-services/dev/mac/last-build-info.json');
+    const { content, error } = await AwsS3Client.readFile(
+      S3_RELEASE_APP_BUCKET,
+      'released-services/dev/mac/last-build-info.json'
+    );
     let buildInfo: BuildInfo | null = content ? JSON.parse(content) : null;
     if (error && !content) {
-        console.log('[NetServicesBuilder] - Last build info error:', error);
-        if (error.name === 'NoSuchKey') {
-            console.log('[NetServicesBuilder] - Last build info not found. Uploading new build info to s3...');
-            buildInfo = await this.initBuildInfo();
-            const uploadResult = await AwsS3Client.uploadFile(S3_RELEASE_APP_BUCKET, 'released-services/dev/mac/last-build-info.json', this.buildInfoFilePath);
-            console.log('[NetServicesBuilder] - Upload build info to s3:', uploadResult);
-        } else {
-            console.error('[NetServicesBuilder] - Last build info error:', error);
-            return;
-        }
-    } 
+      console.log('[NetServicesBuilder] - Last build info error:', error);
+      if (error.name === 'NoSuchKey') {
+        console.log(
+          '[NetServicesBuilder] - Last build info not found. Uploading new build info to s3...'
+        );
+        buildInfo = await this.initBuildInfo();
+        const uploadResult = await AwsS3Client.uploadFile(
+          S3_RELEASE_APP_BUCKET,
+          'released-services/dev/mac/last-build-info.json',
+          this.buildInfoFilePath
+        );
+        console.log(
+          '[NetServicesBuilder] - Upload build info to s3:',
+          uploadResult
+        );
+      } else {
+        console.error('[NetServicesBuilder] - Last build info error:', error);
+        return;
+      }
+    }
     // IF content is not null, compare the build info
-    console.log('[NetServicesBuilder] - Last build info from cloud:', buildInfo);
-     const lastBuildVersion = buildInfo.build; // 20250516.001
-     const [lastBuildDate, lastBuildNumber] = lastBuildVersion.split('.');
-
+    console.log(
+      '[NetServicesBuilder] - Last build info from cloud:',
+      buildInfo
+    );
+    const lastBuildVersion = buildInfo.build; // 20250516.001
+    const [lastBuildDate, lastBuildNumber] = lastBuildVersion.split('.');
 
     if (!this.projectVersion) {
       this.loadProjectVersion();
     }
 
-
-     // Update build version
-     const date = new Date();
-     let count = 0;
-     const yyyyMMdd = date.toISOString().slice(0, 10).replace(/-/g, '');
-     if (this.projectVersion !=  buildInfo.version ||yyyyMMdd > lastBuildDate) {
-        // Reset build number
-        count = 1;
-     } else {
-        // Increment build number
-        count = parseInt(lastBuildNumber) + 1;
-     }
-     const buildVersion = `${yyyyMMdd}.${String(count).padStart(3, '0')}`;
-     this.tempBuildInfo = {
-        version: this.projectVersion,
-        build: buildVersion,
-        commit: execSync('git rev-parse --short HEAD').toString().trim(),
-        timestamp: new Date().toISOString(),
-     }
-     console.log('[NetServicesBuilder] - Next build info:', this.tempBuildInfo);
+    // Update build version
+    const date = new Date();
+    let count = 0;
+    const yyyyMMdd = date.toISOString().slice(0, 10).replace(/-/g, '');
+    if (this.projectVersion != buildInfo.version || yyyyMMdd > lastBuildDate) {
+      // Reset build number
+      count = 1;
+    } else {
+      // Increment build number
+      count = parseInt(lastBuildNumber) + 1;
+    }
+    const buildVersion = `${yyyyMMdd}.${String(count).padStart(3, '0')}`;
+    this.tempBuildInfo = {
+      version: this.projectVersion,
+      build: buildVersion,
+      commit: execSync('git rev-parse --short HEAD').toString().trim(),
+      timestamp: new Date().toISOString(),
+    };
+    // Write build info to file
+    writeFileSync(this.buildInfoFilePath, JSON.stringify(this.tempBuildInfo));
+    console.log('[NetServicesBuilder] - Next build info:', this.tempBuildInfo);
   }
 
   private async initBuildInfo() {
-     // Init
-     this.loadProjectVersion();
-     const version = this.projectVersion;
-     const commit = execSync('git rev-parse --short HEAD').toString().trim();
-     const timestamp = new Date().toISOString(); 
- 
-     const date = new Date();
-     const yyyyMMdd = date.toISOString().slice(0, 10).replace(/-/g, '');
- 
-     const count = 1;
-     const buildNumber = `${yyyyMMdd}.${String(count).padStart(3, '0')}`;
-     const buildInfo = {
-        version,
-        build: buildNumber,
-        commit,
-        timestamp,
-      };
-  
-     writeFileSync(this.buildInfoFilePath, JSON.stringify(buildInfo));
-     return buildInfo;
+    // Init
+    this.loadProjectVersion();
+    const version = this.projectVersion;
+    const commit = execSync('git rev-parse --short HEAD').toString().trim();
+    const timestamp = new Date().toISOString();
+
+    const date = new Date();
+    const yyyyMMdd = date.toISOString().slice(0, 10).replace(/-/g, '');
+
+    const count = 1;
+    const buildNumber = `${yyyyMMdd}.${String(count).padStart(3, '0')}`;
+    const buildInfo = {
+      version,
+      build: buildNumber,
+      commit,
+      timestamp,
+    };
+
+    writeFileSync(this.buildInfoFilePath, JSON.stringify(buildInfo));
+    return buildInfo;
   }
 
   private loadProjectVersion() {
-    const projectFile = path.join(`${this.config.services[0].source}`, `${this.config.services[0].executeFile}.csproj`);
+    const projectFile = path.join(
+      `${this.config.services[0].source}`,
+      `${this.config.services[0].executeFile}.csproj`
+    );
     const projectContent = readFileSync(projectFile, 'utf8');
     const versionMatch = projectContent.match(/<Version>(.*?)<\/Version>/);
     this.projectVersion = versionMatch ? versionMatch[1] : '0.0.1';
   }
   private getPublishServiceName() {
-    if(!this.tempBuildInfo) {
-        return 'unknown';
+    if (!this.tempBuildInfo) {
+      return 'unknown';
     }
-    return `common-services_${platform()}_${this.tempBuildInfo.version}_${this.tempBuildInfo.build}`;
+    return `common-services_${platform()}_${this.tempBuildInfo.version}_${
+      this.tempBuildInfo.build
+    }`;
   }
 
   private async testListVersions() {
     try {
-        const bucket = S3_RELEASE_APP_BUCKET;
-        const folder = 'released-files.042024/prod/luma/mac/versions';
-        const result = await AwsS3Client.readSubFolderDir(bucket, folder);
-        console.log('[NetServicesBuilder] - List object versions:', result);
+      const bucket = S3_RELEASE_APP_BUCKET;
+      const folder = 'released-services/dev/mac/versions';
+      const result = await AwsS3Client.readSubFolderDir(bucket, folder);
+      console.log('[NetServicesBuilder] - List object versions:', result);
     } catch (error) {
-        console.error('[NetServicesBuilder] - List object versions error details:', {
-            error: error.message,
-            code: error.code,
-            requestId: error.$metadata?.requestId,
-            cfId: error.$metadata?.cfId
-        });
+      console.error(
+        '[NetServicesBuilder] - List object versions error details:',
+        {
+          error: error.message,
+          code: error.code,
+          requestId: error.$metadata?.requestId,
+          cfId: error.$metadata?.cfId,
+        }
+      );
     }
-
-    
-   
   }
 
   private async testService(service: NetServiceConfig, output: string) {

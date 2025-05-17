@@ -7709,19 +7709,19 @@
     ]
   },
   "packageFolders": {
-    "/Users/haht/.nuget/packages/": {}
+    "/Users/hafht/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/haht/Documents/Workspace/test/next-lhapp/netcore-services/Common.Services/Common.Services.csproj",
+      "projectUniqueName": "/Users/hafht/Documents/workspaces/next-lhapp/netcore-services/Common.Services/Common.Services.csproj",
       "projectName": "Common.Services",
-      "projectPath": "/Users/haht/Documents/Workspace/test/next-lhapp/netcore-services/Common.Services/Common.Services.csproj",
-      "packagesPath": "/Users/haht/.nuget/packages/",
-      "outputPath": "/Users/haht/Documents/Workspace/test/next-lhapp/netcore-services/Common.Services/obj/",
+      "projectPath": "/Users/hafht/Documents/workspaces/next-lhapp/netcore-services/Common.Services/Common.Services.csproj",
+      "packagesPath": "/Users/hafht/.nuget/packages/",
+      "outputPath": "/Users/hafht/Documents/workspaces/next-lhapp/netcore-services/Common.Services/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/Users/haht/.nuget/NuGet/NuGet.Config"
+        "/Users/hafht/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
@@ -7733,8 +7733,8 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "/Users/haht/Documents/Workspace/test/next-lhapp/netcore-services/Common.Services.Static/Common.Services.Static.csproj": {
-              "projectPath": "/Users/haht/Documents/Workspace/test/next-lhapp/netcore-services/Common.Services.Static/Common.Services.Static.csproj"
+            "/Users/hafht/Documents/workspaces/next-lhapp/netcore-services/Common.Services.Static/Common.Services.Static.csproj": {
+              "projectPath": "/Users/hafht/Documents/workspaces/next-lhapp/netcore-services/Common.Services.Static/Common.Services.Static.csproj"
             }
           }
         }
@@ -7797,11 +7797,11 @@
         "downloadDependencies": [
           {
             "name": "Microsoft.AspNetCore.App.Runtime.osx-arm64",
-            "version": "[8.0.16, 8.0.16]"
+            "version": "[8.0.6, 8.0.6]"
           },
           {
             "name": "Microsoft.NETCore.App.Runtime.osx-arm64",
-            "version": "[8.0.16, 8.0.16]"
+            "version": "[8.0.6, 8.0.6]"
           }
         ],
         "frameworkReferences": {
@@ -7809,7 +7809,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.409/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.301/PortableRuntimeIdentifierGraph.json"
       }
     },
     "runtimes": {
