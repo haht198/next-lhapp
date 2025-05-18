@@ -11,7 +11,7 @@ import { BuildInfo } from '../models/build-info';
 import { executeCommand } from '../utils/shell';
 import { dotnetCommans } from './command';
 import { SigningService } from './signing';
-import { zipFolder } from '../utils/fs';
+import { FsUtil } from '@next-lhapp/utils';
 
 export interface NetServiceConfig {
   name: string;
@@ -110,7 +110,10 @@ export class NetServicesBuilder {
       console.log(
         `[NetServicesBuilder] - Compress publish files into zip file: ${zipFilePath}`
       );
-      const zipResult = await zipFolder(this.config.deployDir, zipFilePath);
+      const zipResult = await FsUtil.zipFolder(
+        this.config.deployDir,
+        zipFilePath
+      );
       if (!zipResult) {
         throw new Error(`[NetServicesBuilder] - Publish failed: Zip failed`);
       }

@@ -1,15 +1,30 @@
 import Logger from '@creative-force/eslogger';
 import { app } from 'electron';
-import { chmodSync, mkdirSync, readdirSync, readFileSync } from 'fs';
+import {
+  chmodSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  writeFileSync,
+} from 'fs';
 import { existsSync } from 'fs';
 import { join } from 'path';
 import { Application } from '../static';
 import { RELEASE_SERVER_URL } from '@creative-force/electron-shared';
 import { BrowserUtils } from '../utils/browser';
-import { unzip } from 'zlib';
-import * as yazl from 'yazl'
+import { FsUtil } from '@next-lhapp/utils';
+import * as rimraf from 'rimraf';
+
 interface NetServiceState {
-  status: 'INITIALIZED' | 'NOT_INSTALLED' | 'INSTALLED' | 'RUNNING' | 'STOPPED';
+  status:
+    | 'INITIALIZED'
+    | 'NOT_INSTALLED'
+    | 'CHECKING_VERSION'
+    | 'DOWNLOADING'
+    | 'UNZIPPING'
+    | 'INSTALLED'
+    | 'RUNNING'
+    | 'STOPPED';
 }
 
 export class NetService {
@@ -53,6 +68,28 @@ export class NetService {
       this.state.status = 'INSTALLED';
     }
 
+    // setTimeout(() => {
+    //   // test unzip
+    //   // remove install services folder
+    //   console.log(
+    //     'remove install services folder',
+    //     this.INSTALL_SERVICES_FOLDER
+    //   );
+    //   rimraf.sync(this.INSTALL_SERVICES_FOLDER);
+    //   const zipFilePath = `/Users/hafht/Library/Application Support/Electron/Creative Force/temp-download/common-services_darwin_1.0.0_20250517.002.zip`;
+    //   FsUtil.unZipFiles(zipFilePath, this.INSTALL_SERVICES_FOLDER)
+    //     .then((result) => {
+    //       console.log('unzipService result', result);
+    //     })
+    //     .catch((error) => {
+    //       console.log('unzipService error', error);
+    //     });
+
+    //   // this.installServices();
+    //   // this.initSocketServer();
+    // }, 2000);
+    // return;
+
     // If service is installed, init socket server
     if (this.state.status === 'INSTALLED') {
       this.initSocketServer();
@@ -80,9 +117,9 @@ export class NetService {
       );
     }
 
-    // // check permission temp download folder has write permission
-    // // chmod write permission
-    // chmodSync(this.TEMP_DOWNLOAD_FOLDER, 0o777);
+    // update state
+    this.state.status = 'CHECKING_VERSION';
+    this.emitState();
 
     const downloadUrl = `https://download.creativeforce-dev.io/released-services/dev/mac/last-build-info.json`;
     const task = BrowserUtils.downloadFile({
@@ -106,9 +143,13 @@ export class NetService {
       )
     );
     console.log('buildInfo', buildInfo);
+
     // enrich download service url
     const downloadServiceUrl = `${RELEASE_SERVER_URL}released-services/dev/mac/versions/${buildInfo.version}/common-services_darwin_${buildInfo.version}_${buildInfo.build}.zip`;
     console.log('do download service url', downloadServiceUrl);
+    // update state
+    this.state.status = 'DOWNLOADING';
+    this.emitState();
     // download service
     const serviceTask = BrowserUtils.downloadFile({
       url: downloadServiceUrl,
@@ -127,32 +168,49 @@ export class NetService {
       return;
     }
     // unzip service
-    const unzipService = await unzip(
-      join(this.TEMP_DOWNLOAD_FOLDER, 'common-services.zip'),
-      (error, result) => {
-        if (error) {
-          Logger.error('[Core] - Net Service - Failed to unzip service', error);
-          return;
-        }
-        console.log('unzipService', result);
-      }
+    this.state.status = 'UNZIPPING';
+    this.emitState();
+    const unzipService = await FsUtil.unZipFiles(
+      join(
+        this.TEMP_DOWNLOAD_FOLDER,
+        `common-services_darwin_${buildInfo.version}_${buildInfo.build}.zip`
+      ),
+      join(this.INSTALL_SERVICES_FOLDER, 'dist')
     );
-    console.log('unzipService', unzipService);
-    // move service to install services folder
-    const installServiceFolder = join(
-      this.INSTALL_SERVICES_FOLDER,
-      'common-services'
-    );
-    if (!existsSync(installServiceFolder)) {
-      mkdirSync(installServiceFolder, { recursive: true });
-      Logger.info(
-        `[Core] Create install service folder: ${installServiceFolder}`
+    Logger.info('[Core] - Net Service - Unzip service result', unzipService);
+    if (unzipService) {
+      // copy build info to install services folder
+      const buildInfoPath = join(
+        this.INSTALL_SERVICES_FOLDER,
+        'build-info.json'
       );
+      writeFileSync(buildInfoPath, JSON.stringify(buildInfo, null, 2));
+      Logger.info(
+        '[Core] - Net Service - Copy build info to install services folder',
+        buildInfoPath
+      );
+      // remove temp download folder
+      Logger.info(
+        '[Core] - Net Service - Remove temp download folder',
+        this.TEMP_DOWNLOAD_FOLDER
+      );
+      rimraf.sync(this.TEMP_DOWNLOAD_FOLDER);
+      // update state
+      Logger.info('[Core] - Net Service - Update state to INSTALLED');
+      this.state.status = 'INSTALLED';
+      Application.emitApplicationState({
+        netService: this.state,
+      });
     }
   }
-  
 
   private static initSocketServer() {
     Logger.info('[Core] - Net Service - Init socket server...');
+  }
+
+  private static emitState() {
+    Application.emitApplicationState({
+      netService: this.state,
+    });
   }
 }
