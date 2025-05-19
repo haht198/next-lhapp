@@ -3,6 +3,7 @@
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/main/utils/src",
   "projectType": "library",
+  "buildable": true,
   "tags": [],
   "targets": {
     "build": {

@@ -3,6 +3,7 @@
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/main/core/src",
   "projectType": "library",
+  "buildable": true,
   "release": {
     "version": {
       "generatorOptions": {

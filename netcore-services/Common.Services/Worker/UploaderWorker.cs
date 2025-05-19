@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading.Tasks;
 // using Common.Services.Data.User;
 // using Common.Services.Static;
@@ -23,6 +24,8 @@ namespace Common.Services.Worker
 
         }
 
+        private string versionInfo =  Assembly.GetEntryAssembly()?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
+
         public async Task DoWork()
         {
             Console.WriteLine("DO work uploader");
@@ -32,7 +35,11 @@ namespace Common.Services.Worker
             {
               Console.WriteLine("[Uploader] Handler socket data", socketData);
               // Mock return data
-              SocketIntegration.Send(SocketEvents.FinishUpload, "FINISH_UPLOAD_RESULT_v1.0.0");
+              var data = new Dictionary<string, object>();
+              data.Add("status", "OK");
+              data.Add("message", $"FINISH_UPLOAD_RESULT_v{versionInfo}");
+              data.Add("socketData", socketData);
+              SocketIntegration.Send(SocketEvents.FinishUpload, data);
             });
         }
 

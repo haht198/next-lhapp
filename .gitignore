@@ -130,3 +130,51 @@ artifacts/
 **/**/*.scc
 .cursor/rules/nx-rules.mdc
 .github/instructions/nx.instructions.md
+
+# Node
+node_modules/
+dist/
+.nx/
+coverage/
+
+# Logs
+*.log
+
+# MacOS
+.DS_Store
+
+# VSCode
+.vscode/
+
+# IDE
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# .NET
+bin/
+obj/
+*.dll
+*.pdb
+*.exe
+*.app
+*.db
+*.TestResults/
+*.vs/
+
+# Env
+.env
+.env.*
+
+# Others
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build output
+*.tgz
+
+# Optional: ignore local config
+*.local.*

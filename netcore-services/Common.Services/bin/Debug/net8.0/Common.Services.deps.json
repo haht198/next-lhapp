@@ -922,7 +922,10 @@
           "WebSocket4Net": "0.15.2"
         },
         "runtime": {
-          "Common.Services.Static.dll": {}
+          "Common.Services.Static.dll": {
+            "assemblyVersion": "1.0.0",
+            "fileVersion": "1.0.0.0"
+          }
         }
       }
     }

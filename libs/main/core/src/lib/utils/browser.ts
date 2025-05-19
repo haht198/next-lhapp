@@ -24,6 +24,12 @@ export class DownloadFileProcesses implements IDownloadFileProcesses {
   private webContent: WebContents;
   private _promise!: Promise<boolean>;
 
+  onProgress?: (progress: {
+    filename: string;
+    receivedBytes: number;
+    totalBytes: number;
+  }) => void;
+
   constructor(
     params: DownloadFileParams & {
       webContent: WebContents;
@@ -52,15 +58,18 @@ export class DownloadFileProcesses implements IDownloadFileProcesses {
         // setup download listener
         this.webContent.session.on('will-download', (event, item) => {
           item.setSavePath(this.downloadFolder);
-
+          // caculate progress percentage
+          let progress = 0;
           item.on('updated', (_, state) => {
-            // log progress
-            console.log(
-              'download progress',
-              state,
-              item.getReceivedBytes(),
-              item.getTotalBytes()
-            );
+            if (state === 'progressing') {
+              progress =
+                (item.getReceivedBytes() / item.getTotalBytes()) * 100;
+              this.onProgress?.({
+                filename: item.getFilename(),
+                receivedBytes: item.getReceivedBytes(),
+                totalBytes: item.getTotalBytes(),
+              });
+            }
           });
 
           item.once('done', (_, state) => {

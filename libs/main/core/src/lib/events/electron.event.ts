@@ -14,3 +14,33 @@ ipcMain.handle(API_EVENTS.GET_APPLICATION_STATE, () => {
     netService: NetService.state,
   };
 });
+
+ipcMain.handle(API_EVENTS.NET_SERVICE.INSTALL, () => {
+  return NetService.installServices();
+});
+
+ipcMain.handle(API_EVENTS.NET_SERVICE.UNINSTALL, () => {
+  return NetService.uninstallServices();
+});
+
+ipcMain.handle(API_EVENTS.NET_SERVICE.CHECK_VERSION, () => {
+  return NetService.checkVersion();
+}); 
+
+ipcMain.handle(API_EVENTS.NET_SERVICE.DOWNLOAD, (_, buildInfo: any) => {
+  return NetService.downloadNewVersion(buildInfo);
+});
+
+
+ipcMain.handle(API_EVENTS.NET_SERVICE.START, (_, service: string) => {
+  return NetService.startProcess(service);
+});
+
+
+ipcMain.handle(API_EVENTS.NET_SERVICE.STOP, (_, service: string) => {
+  return NetService.stopProcess(service);
+});
+
+ipcMain.handle(API_EVENTS.NET_SERVICE.TEST_UPLOAD, () => {
+  return NetService.testUpload();
+});

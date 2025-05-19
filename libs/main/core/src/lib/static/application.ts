@@ -12,6 +12,8 @@ export class Application {
 
   static isBootstrapped = false;
   static bootstrapTime = 0;
+  static instanceId = '';
+  static errors = {} as any;
 
   static initState() {
     console.log('[Core] Init application state...');
