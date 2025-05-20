@@ -1,0 +1,25 @@
+<div class="internal-post">
+    <div class="container">
+        <!-- Tasks column -->
+        <div class="tasks-column">
+            <h2>Internal Post ({{ taskList().length }} tasks)</h2>
+            <div class="task-list">
+                <div class="task-item" *ngFor="let task of taskList()">
+                    <div class="task-item-product-code">{{ task.productCode }} 
+        
+                        <span class="video-lable" *ngIf="task.isVideo">Video</span>
+                    </div>
+                    <span class="task-item-job-name">{{ task.jobName }}</span>
+                    <div class="task-item-input">Input: {{ task.totalAssets }} assets</div>
+                    <!-- Start button -->
+                    <button class="task-item-start-button" (click)="startTask(task.taskId)">Start</button>
+                </div>
+            </div>
+        </div>
+        <!-- Process column -->
+        <div class="process-column">
+            <h2>Process</h2>
+        </div>
+    </div>
+</div>
+

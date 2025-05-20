@@ -6,6 +6,7 @@ import { ApplicationState } from '../models/poroject.model';
 import { AuthService } from '../services/auth.service';
 import { HttpClient } from '@angular/common/http';
 import { CFAPIService } from '../services/cf-api.services';
+import { InternalPostComponent } from '../components/internal-post.component';
 
 
 @Component({
@@ -15,7 +16,8 @@ import { CFAPIService } from '../services/cf-api.services';
   standalone: true,
   imports: [
     CommonModule,
-    MatExpansionModule
+    MatExpansionModule,
+    InternalPostComponent
   ]
 })
 export class ProjectComponent implements OnInit, OnDestroy {
@@ -55,6 +57,8 @@ export class ProjectComponent implements OnInit, OnDestroy {
     this.authService.token$.subscribe((token) => {
       console.log('token', token);
       if (!token) {
+        // remove user info
+        this.userInfo.set(null);
         return;
       }
       this.getMyUserInfo();

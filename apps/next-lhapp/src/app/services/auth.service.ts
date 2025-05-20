@@ -10,7 +10,7 @@ import qs from 'qs';
 })
 export class AuthService {  
     private _httpClient = inject(HttpClient);
-    clientId: 'hue' | 'luma' | 'ink' = 'luma';
+    clientId: 'hue' | 'luma' | 'ink' = 'hue';
  
     isInitialized = signal(false);
 
