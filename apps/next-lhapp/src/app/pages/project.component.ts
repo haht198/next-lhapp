@@ -1,60 +1,27 @@
-import { Component, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CFRendererIPCEvent } from '@creative-force/electron-core/preload';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { ApplicationState } from '../models/poroject.model';
+import { AuthService } from '../services/auth.service';
+import { HttpClient } from '@angular/common/http';
+import { CFAPIService } from '../services/cf-api.services';
 
-interface ElectronCore {
-  getApplicationState(): Promise<ApplicationState>;
-  onApplicationStateChange(
-    callback: (state: ApplicationState) => void
-  ): CFRendererIPCEvent;
-}
-
-interface ApplicationState {
-  isReady?: boolean;
-  version?: string;
-  platform?: string;
-  bootstrapTime: number;
-  [key: string]: any;
-}
-
-declare global {
-  interface Window {
-    electronCore: ElectronCore;
-  }
-}
 
 @Component({
   selector: 'app-project',
-  template: `
-    <div class="project-page">
-      <h1>Application State</h1>
-      <pre>{{ applicationState() | json }}</pre>
-    </div>
-  `,
-  styles: [
-    `
-      .project-page {
-        padding: 20px;
-        background-color: #f0f0f0;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      }
-      h1 {
-        color: #333;
-        font-size: 24px;
-        margin-bottom: 10px;
-      }
-      p {
-        color: #666;
-        font-size: 16px;
-        line-height: 1.5;
-      }
-    `,
-  ],
+  templateUrl: './project.component.html',
+  styleUrls: ['./project.component.scss'],
   standalone: true,
-  imports: [CommonModule],
+  imports: [
+    CommonModule,
+    MatExpansionModule
+  ]
 })
 export class ProjectComponent implements OnInit, OnDestroy {
+  httpClient = inject(HttpClient);
+  authService = inject(AuthService);
+  cfApiService = inject(CFAPIService);
   applicationState = signal<ApplicationState>({
     isReady: false,
     version: '',
@@ -62,6 +29,9 @@ export class ProjectComponent implements OnInit, OnDestroy {
     bootstrapTime: 0,
   });
 
+  userInfo = signal<any>(null);
+
+  readonly mockAPI = 'https://660ab815ccda4cbc75db9f5c.mockapi.io/user'
   private _subscription: CFRendererIPCEvent | null = null;
 
   ngOnInit() {
@@ -82,6 +52,17 @@ export class ProjectComponent implements OnInit, OnDestroy {
         }));
       }
     );
+    this.authService.token$.subscribe((token) => {
+      console.log('token', token);
+      if (!token) {
+        return;
+      }
+      this.getMyUserInfo();
+    });
+  }
+
+  ngAfterViewInit() {
+    this.authService.initialize();
   }
 
   ngOnDestroy() {
@@ -89,4 +70,13 @@ export class ProjectComponent implements OnInit, OnDestroy {
       this._subscription.unsubscribe();
     }
   }
+
+  getMyUserInfo() {
+    this.cfApiService.getMyUserInfo().subscribe((res) => {
+      if  (res.data) {
+        this.userInfo.set(res.data);
+      }
+    });
+  }
+ 
 }

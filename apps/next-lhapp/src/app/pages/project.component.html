@@ -1,0 +1,29 @@
+<div class="project-page">
+
+    <div class="project-page-header">
+        <ng-container *ngIf="userInfo()">
+            <h2>Hi <span class="user-name">{{ userInfo().firstName }} {{ userInfo().lastName }}</span></h2>
+            <!-- <p>Welcome to the Creative Force HUE application.</p> -->
+            <!-- <pre>{{ userInfo() | json }}</pre> -->
+            <button  class="logout-button" (click)="authService.logout()">Log out</button>
+        </ng-container>
+        <ng-container *ngIf="!userInfo()">
+            <div class="login-button-container">
+                <button *ngIf="!authService.token()" class="login-button" (click)="authService.login()">Login</button>
+                <button *ngIf="authService.token()" class="logout-button" (click)="authService.logout()">Log out</button>
+            </div>
+        </ng-container>
+        
+    </div>
+
+    <div class="project-page-content">
+        <mat-expansion-panel class="state-panel">
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    <h2>Application State</h2>
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            <pre class="state-content">{{ applicationState() | json }}</pre>
+        </mat-expansion-panel>
+    </div>
+  </div>

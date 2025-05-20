@@ -1,0 +1,68 @@
+:root {
+  --cf-font: 'Inter', sans-serif;
+  --cf-font-icon: 'creative-force', sans-serif;
+
+  --cf-darkui-line: #404040;
+  --cf-darkui-image-tile: #383838;
+  --cf-darkui-menu-bg: #000000;
+  --cf-darkui-dark: #262626;
+  --cf-darkui-darker: #323232;
+  --cf-darkui-darkest: #191919;
+  --cf-darkui-dialog: #343434;
+
+  --cf-blue-primary: #3466F6;
+  --cf-blue: #3E82FB;
+  --cf-blue-hover: #2a78ff;
+  --cf-grey: #E2E2E2;
+  --cf-white: #FFFFFF;
+
+  --cf-text-color: #141414;
+  --cf-dark-purple: #1B1A3D;
+  --cf-red: #E44545;
+  --cf-orange: #F2A43B;
+  --cf-green: #7BBA36;
+  --cf-green-dark: #517C22;
+  --cf-purple: #9943C9;
+
+  --cf-grey-dark: #474747;
+  --cf-grey-regular: #848484;
+  --cf-grey-light: #D4D4D4;
+  --cf-grey-super-light-v2: #EBEBEB;
+  --cf-grey-super-light: #F6F6F6;
+  --cf-grey-medium: #5a5a5a;
+
+  --cf-black: #000000;
+
+  --cf-border-scrollbar: 2px;
+  --cf-width-scrollbar: 8px;
+  --cf-corner-scrollbar: 4px;
+  --cf-color-scrollbar-light: #cccccc;
+  --cf-color-scrollbar-dark: #404040;
+
+  --cf-letter-spacing-s: 0.4px;
+  --cf-letter-spacing-x: 0.6px;
+
+  --cf-spacing-gap-normal: 26px;
+  --cf-spacing-gap-sm: 10px;
+
+  --nav-height: 64px;
+  --min-width-dropdown-nav: 180px;
+
+  --cf-input-bg: #1b1b1b;
+
+  --cf-tomato: #F4221E;
+  --cf-tomato-card: #F3A195;
+  --cf-tomato-dim: #FFE2DE;
+
+  --scrollbar-size-small-macos: 12px;
+
+  --cf-white-opcity-01: rgba(255, 255, 255, .1);
+  --cf-white-opcity-015: rgba(255, 255, 255, .15);
+  --cf-white-opcity-02: rgba(255, 255, 255, .2);
+  --cf-white-opcity-025: rgba(255, 255, 255, .25);
+  --cf-white-opcity-05: rgba(255, 255, 255, .5);
+  --cf-black-opcity-01: rgba(0, 0, 0, .1);
+  --cf-black-opcity-02: rgba(0, 0, 0, .2);
+  --cf-black-opcity-03: rgba(0, 0, 0, .3);
+  --cf-black-opcity-05: rgba(0, 0, 0, .5);
+}

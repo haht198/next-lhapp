@@ -76,7 +76,7 @@ export default class App {
       show: false,
       webPreferences: {
         contextIsolation: true,
-        backgroundThrottling: false,
+        webSecurity: false,
         preload: join(__dirname, 'main.preload.js'),
       },
     });
