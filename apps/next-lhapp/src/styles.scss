@@ -30,3 +30,20 @@ a {
   text-decoration: none;
   color: inherit;
 }
+::ng-deep {
+  .mat-expansion-panel-header {
+    padding: 16px;
+  }
+
+  .mat-expansion-panel-header-title {
+    h2 {
+      margin: 0;
+      font-size: 18px;
+      color: #333;
+    }
+  }
+
+  .mat-expansion-panel-header-description {
+    color: #666;
+  }
+}

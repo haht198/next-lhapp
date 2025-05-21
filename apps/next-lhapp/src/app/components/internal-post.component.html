@@ -2,9 +2,16 @@
     <div class="container">
         <!-- Tasks column -->
         <div class="tasks-column">
-            <h2>Internal Post ({{ taskList().length }} tasks)</h2>
+            <div class="tasks-column-header">
+                <h2>Internal Post ({{ taskList().length }} tasks)</h2>
+                <select class="tasks-column-header-select"
+                [ngModel]="selectedProductionType()"
+                (ngModelChange)="changeProductionType($event)">
+                    <option *ngFor="let productionType of productionTypes" [value]="productionType.id" >{{ productionType.name }}</option>
+                </select>
+            </div>
             <div class="task-list">
-                <div class="task-item" *ngFor="let task of taskList()">
+                <div class="task-item" *ngFor="let task of filteredTaskList()">
                     <div class="task-item-product-code">{{ task.productCode }} 
         
                         <span class="video-lable" *ngIf="task.isVideo">Video</span>
@@ -19,6 +26,47 @@
         <!-- Process column -->
         <div class="process-column">
             <h2>Process</h2>
+            <div class="process-bar">
+                <div class="process-bar-item" *ngFor="let step of workflow()" [ngClass]="{
+                    'doing': step.status >= WorkflowStatus.DOING,
+                    'done': step.status >= WorkflowStatus.DONE,
+                    'error': step.status >= WorkflowStatus.ERROR
+                }">
+                    <span class="process-bar-item-name">{{ step.name }}</span>
+                    <span class="process-bar-item-status">{{ step.status | workflowStatusDisplay }}</span>
+                </div>
+                
+            </div>
+            <!--Session data -->
+            <div class="session-data" *ngIf="sessionData()">
+                <!-- Reverse session data -->
+                <mat-expansion-panel *ngFor="let key of sessionKeys.reverse()" class="mb-10">
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            <h2>{{ key }}</h2>
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    @let data = sessionData().get(key);
+                    @if (key === 'Selected Assets') {
+                        <div class="selected-assets">
+                            <div class="selected-assets-item" *ngFor="let asset of data">
+                                <h3>{{ asset.positionName }}</h3>
+                                @for (file of asset.cfAssetFiles; track file.fileId) {
+                                    <div class="selected-assets-item">
+                                        <img [src]="file.smallThumbnailUrl" alt="Asset">
+                                        <div class="selected-assets-item-info">
+                                            <span class="selected-assets-item-name">{{ file.fileName }}</span>
+                                            <span class="selected-assets-item-size">{{ file.length | fileSizeDisplay }}</span>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    } @else {
+                        <pre class="state-content">{{ data | json }}</pre>
+                    }
+                </mat-expansion-panel>
+            </div>
         </div>
     </div>
 </div>

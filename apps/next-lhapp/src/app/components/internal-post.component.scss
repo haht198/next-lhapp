@@ -20,10 +20,6 @@
     flex: 1 1 350px;
     min-width: 320px;
     max-height: 600px;
-}
-
-.tasks-column {
-    margin-right: 16px;
     overflow-y: auto;
 }
 
@@ -114,3 +110,148 @@
     }
 }
 
+.process-bar {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin: 24px 0 16px 0;
+    overflow-x: auto;
+}
+
+.process-bar-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 120px;
+    padding: 4px 6px;
+    background: #f5f7fa;
+    border-radius: 8px 8px 0 0;
+    border: 1px solid #e0e0e0;
+    border-bottom: 3px solid transparent;
+    margin-right: 8px;
+    transition: background 0.2s, border-bottom 0.2s, color 0.2s;
+    position: relative;
+}
+
+.process-bar-item.doing {
+    background: #2196f3;
+    color: #fff;
+    border-bottom: 3px solid #1976d2;
+    font-weight: 600;
+    z-index: 2;
+}
+
+.process-bar-item.done {
+    background: #4caf50;
+    color: #fff;
+    border-bottom: 3px solid #388e3c;
+}
+
+.process-bar-item.error {
+    background: #f44336;
+    color: #fff;
+    border-bottom: 3px solid #d32f2f;
+}
+
+.process-bar-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 3px;
+    background: #e0e0e0;
+    z-index: 1;
+}
+
+.process-bar-item.active:not(:last-child)::after {
+    background: #2196f3;
+}
+
+.process-bar-item-name {
+    font-size: 11px;
+    margin-bottom: 4px;
+}
+
+.process-bar-item-status {
+    font-size: 9px;
+    color: #888;
+}
+
+@media (max-width: 600px) {
+    .process-bar-item {
+        min-width: 90px;
+        padding: 8px 8px;
+    }
+    .process-bar {
+        margin: 12px 0 8px 0;
+    }
+}
+
+.session-data-panel {
+    margin: 20px 0;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(33,150,243,0.08);
+    background: #f7fafd;
+    overflow: hidden;
+}
+
+.session-data-panel ::ng-deep .mat-expansion-panel-header {
+    background: #e3f2fd;
+    border-radius: 8px 8px 0 0;
+    padding: 16px;
+}
+
+.session-data-panel ::ng-deep .mat-panel-title h2 {
+    font-size: 18px;
+    color: #1976d2;
+    margin: 0;
+}
+
+.session-data-panel ::ng-deep .mat-expansion-panel-content {
+    background: #fff;
+}
+
+.state-content {
+    background: #f5f5f5;
+    padding: 12px;
+    border-radius: 0 0 8px 8px;
+    font-family: 'Fira Mono', 'Consolas', monospace;
+    font-size: 14px;
+    color: #263238;
+    line-height: 1.6;
+    margin: 0;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+    max-height: 330px;
+    overflow-y: auto;
+    font-size: 12px;
+}
+
+.mb-10 {
+    margin-bottom: 10px;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+mat-expansion-panel {
+    animation: fadeIn 0.5s cubic-bezier(0.4,0,0.2,1);
+}
+
+.selected-assets-item-size {
+    font-size: 12px;
+    color: #666;
+    margin-left: 4px;
+}
