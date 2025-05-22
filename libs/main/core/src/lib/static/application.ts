@@ -7,8 +7,10 @@ import { BrowserWindow } from 'electron';
 
 export class Application {
   static get netServices() {
-    return {};
+    return this._netService;
   }
+
+  private static _netService: any;
 
   static isBootstrapped = false;
   static bootstrapTime = 0;
@@ -29,6 +31,9 @@ export class Application {
 
   static emitApplicationState(state: any) {
     console.log('[Core] Emit application state...', state);
+    if (state.netService) {
+      this._netService = state.netService;
+    }
     // emit ipc event to all windows
     // get all windows
     const windows = BrowserWindow.getAllWindows();

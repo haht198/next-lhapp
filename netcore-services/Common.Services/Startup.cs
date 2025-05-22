@@ -6,8 +6,13 @@ using System.IO;
 using System.Reflection;
 using System.Threading;
 using Common.Services.Core;
+using Common.Services.Model.Uploader;
+using Common.Services.Services;
+using Common.Services.Services.Implements;
 using Common.Services.Static;
 using Common.Services.Static.Logger;
+using Common.Services.Static.Queue;
+using Common.Services.Static.Queue.Core;
 using Common.Services.Worker;
 
 namespace Common.Services
@@ -82,9 +87,11 @@ namespace Common.Services
         {
             if (ProgramArguments.Service == ServiceIdentifier.UPLOADER)
             {
-
+                _services.AddSingleton(new QueueSetting<UploadFileModel> { ProcessingThread = 2 });
+                _services.AddSingleton<IQueue<UploadFileModel>, FIFO<UploadFileModel>>();
                 _services.AddSingleton<IServiceWorker, UploaderWorker>();
                 _services.AddHostedService<HostedService<IServiceWorker>>();
+                _services.AddSingleton<IUploadService, UploadService>();
             }
             else
             {

@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import { electronCoreApi } from '@creative-force/electron-core/preload';
+import { electronCoreApi, createUploaderPreload } from '@creative-force/electron-core/preload';
 
 contextBridge.exposeInMainWorld('electron', {
   getAppVersion: () => ipcRenderer.invoke('get-app-version'),
@@ -11,3 +11,4 @@ contextBridge.exposeInMainWorld('electron', {
 });
 
 electronCoreApi();
+createUploaderPreload();

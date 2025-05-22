@@ -68,6 +68,9 @@ class _NetService {
   private lastDownloadEmitTime = 0;
   private readonly DOWNLOAD_THROTTLE_TIME = 1000; // 800ms
   private socketServer!: CFAppSocketServer;
+
+  netServiceProcesses: Record<string, NetServiceProcess> = {};
+
   bootstrap() {
     Logger.info('[Core] - Net Service - Bootstrap net services...');
     // Check application installed services
@@ -99,6 +102,7 @@ class _NetService {
       );  
       console.log('currentBuildInfo', this.state.currentBuildInfo);
       this.state.isInstalled = true;
+      this.emitState();
     }
    
     // If service is installed, init socket server
@@ -118,7 +122,7 @@ class _NetService {
     }
   }
 
-  async startProcess(identifier: string) {
+  async startProcess(identifier: string, isDebug = false) {
     // Check socket server is started
     if (!this.socketServer) {
       await this.initSocketServer();
@@ -138,7 +142,19 @@ class _NetService {
         port: SocketConfig.port,
       }
     }
+
     const process = new NetServiceProcess( join(this.INSTALL_SERVICES_FOLDER, 'dist', 'Common.Services'), _processArgs);
+  
+    if (isDebug) {
+      this.netServiceProcesses[identifier] = process;
+      this.state.processes[identifier] = process;
+      return {
+        process,
+        integration: this.createServiceIntegration(identifier),
+        _processArgs,
+        isDebug: true,
+      }
+    }
     const result = process.start();
     if (!result.isSuccess) {
       Logger.error(`[Core] - NetService - Start ${identifier} service failed.`, {
@@ -146,28 +162,29 @@ class _NetService {
       });
       return;
     }
-    this.state.processes[identifier] = process;
-    // send change
-    // listen event from socket server
-    this.socketServer.listen('uploader', 'request-user-settings', (data) => {
-      Logger.info('[Core] - Net Service - Request user settings received', data);
-      const mockData = {
-        userId: 'mock-user_'+ v4(),
-        userName: 'HaHT',
-        studioName: 'Creative Force',
-        studioId: 'mock-studio_'+ v4(),
-        workspace: '/Users/haht/Downloads',
+    this.netServiceProcesses[identifier] = process;
+    this.state.processes[identifier] = process;    
+    return {
+      process,
+      integration: this.createServiceIntegration(identifier),
+      _processArgs,
+      isDebug: false,
+    }
+  }
+
+  private createServiceIntegration(identifier: string) {
+    const process = this.state.processes[identifier];
+    if (!process || !this.socketServer) {
+      return;
+    }
+    return {
+      listen: (event: string, callback: (data: any) => void) => {
+        this.socketServer.listen(identifier, event, callback);
+      },
+      send: (event: string, data: any) => {
+        this.socketServer.send(identifier, event, data);
       }
-      this.socketServer.send('uploader', 'change-user-settings', mockData);
-    });
-    this.socketServer.listen('uploader', 'request-host-application-state', (data) => {
-      Logger.info('[Core] - Net Service - Request host application state received', data);
-      const mockData = {
-        appName: app.getName(),
-        appVersion: app.getVersion(),
-      }
-      this.socketServer.send('uploader', 'change-host-application-state', mockData);
-    });
+    }
   }
 
   async testUpload() {

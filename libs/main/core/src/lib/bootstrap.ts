@@ -3,9 +3,18 @@ import { Application } from './static';
 import Logger, { LogConfig } from '@creative-force/eslogger';
 import { bootstrapElectronEvents } from './events/electron.event';
 
+export interface ICFAppModule {
+  bootstrap: () => void;
+  bootstrapAsync?: () => Promise<void>;
+}
+
+export interface CFAppModuleProvider extends ICFAppModule {
+  boostrapFactory: () => void;
+}
+
 export interface ApplicationConfig {
   appName: string;
-  appPort: number;
+  modules?: ICFAppModule[] | CFAppModuleProvider[];
 }
 
 export const bootstrapApplication = (config: ApplicationConfig) => {
@@ -23,6 +32,9 @@ export const bootstrapApplication = (config: ApplicationConfig) => {
   Logger.info(
     `[Core] Bootstrap application time: ${Application.bootstrapTime}ms`
   );
+  config.modules?.forEach((module) => {
+    module?.bootstrap();
+  });
 };
 
 // Bootstrap application flow

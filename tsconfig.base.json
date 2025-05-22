@@ -20,6 +20,9 @@
         "libs/main/core/src/lib/preload/src/index.ts"
       ],
       "@creative-force/electron-shared": ["libs/shared/src/index.ts"],
+      "@creative-force/electron-uploader/main": [
+        "libs/main/uploader/src/index.ts"
+      ],
       "@next-lhapp/builder-services": ["plugins/builder-services/src/index.ts"],
       "@next-lhapp/utils": ["libs/main/utils/src/index.ts"]
     }

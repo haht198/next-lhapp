@@ -5,6 +5,23 @@ export interface ElectronCore {
   onApplicationStateChange(
     callback: (state: ApplicationState) => void
   ): CFRendererIPCEvent;
+  fileSystem: {
+    getFileInfo: (paths: string[]) => Promise<FileInfo[]>;
+  };
+}
+
+export interface FileInfo {
+  path: string;
+  exists: boolean;
+  info: {
+    size: number;
+    isFile: boolean;
+    isDirectory: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+    ext: string;
+    name: string;
+  };
 }
 
 export interface ApplicationState {
@@ -26,5 +43,9 @@ declare global {
   interface Window {
     electronCore: ElectronCore;
     electron: ElectronAPI;
+    electronUploader: {
+      bootstrap: () => Promise<void>;
+      uploadBatchFiles: (payload: any) => void
+    };
   }
 }

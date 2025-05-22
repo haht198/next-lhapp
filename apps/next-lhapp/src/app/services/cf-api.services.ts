@@ -50,6 +50,14 @@ export class CFAPIService {
       return this._httpClient.post<ApiResponse<any>>(`${this._baseUrl}/workflow/v2/internalpostproduction/gettasksdetailv2`, taskIds, { headers: this.getRequestHeaders() });
     }
 
+    getAssetPresignedUrl(payload: any) {
+      return this._httpClient.post<ApiResponse<any>>(`${this._baseUrl}/asset/v2/assets/get-presigned-url`, payload, { headers: this.getRequestHeaders() });
+    }
+
+    getTaskExpectedOutputName(taskId: string) {
+      return this._httpClient.get<ApiResponse<any>>(`${this._baseUrl}/workflow/v2/internalpostproduction/${taskId}/expectedoutputname`, { headers: this.getRequestHeaders() });
+    }
+
     getFiles(assetIds: string[],  urlResponseTypes: number[] = []) {
       return this._httpClient.post<ApiResponse<any>>(`${this._baseUrl}/asset/v2/files/getimagesbyidsv2?attrFlag=1&cache=true&includeCropInfo=${false}&urlResponseTypes=${urlResponseTypes.join(",")}`, Array.from(new Set(assetIds)), { headers: this.getRequestHeaders() });
     }

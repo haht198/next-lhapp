@@ -3,11 +3,14 @@ import { CFAPIService } from '../services/cf-api.services';
 import { AuthService } from '../services/auth.service';
 import { CFAssetFile, InternalPostTask, internalPostWorkflow, ShootingType, TaskDetail, TaskList, Workflow, WorkflowStatus } from '../models/task.model';
 import { CommonModule } from '@angular/common';
-import { combineLatest, map, of, switchMap, tap } from 'rxjs';
+import { combineLatest, firstValueFrom, from, map, of, switchMap, tap } from 'rxjs';
 import { SHOOTING_TYPE_CATEGORY_ID } from '../constants/task';
 import { FormsModule } from '@angular/forms';
 import { WorkflowStatusDisplayPipe, FileSizeDisplayPipe } from './workflow-status.pipe';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { TaskUploader } from '../services/uploader/task-uploader';
+import { GetFilesToUploadResponse } from '../services/uploader/config';
+import { PresignedUrlErrorAssetFile, PresignedUrlAssetFile, GetPresignedUrlResult } from '../services/uploader/types';
 
     @Component({
   selector: 'app-internal-post',
@@ -40,6 +43,14 @@ export class InternalPostComponent implements OnInit {
     }
   });
 
+  get objectKeys() {
+    return Object.keys;
+  }
+
+  get sessionKeys(): string[] {
+    return Array.from(this.sessionData().keys());
+  }
+
   readonly productionTypes = [
     {
       id: 1,
@@ -55,6 +66,8 @@ export class InternalPostComponent implements OnInit {
     },
   ];
 
+  private _taskUploader: TaskUploader | null = null;
+
   ngOnInit() {
     this.authService.token$.subscribe((token) => {
       if (!token) { 
@@ -62,12 +75,24 @@ export class InternalPostComponent implements OnInit {
         return;
       }
       this.getListTasks();
+       // Init task uploader
+    this._taskUploader = new TaskUploader({
+        clientId: 'hue',
+        getFilesToUpload: (taskId: string) => this.getFilesToUpload(taskId),
+        getPresignedUrl: (payload: any) => this.getPresignedUrl(payload),
+        submitTask: () => {
+          return Promise.resolve(null);
+        },
+      });
     });
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     //@ts-ignore
     window.__internalPost = this;
+   
   }
+
+ 
 
   startTask(taskId: string) {
     console.log('Start task', taskId);
@@ -94,6 +119,7 @@ export class InternalPostComponent implements OnInit {
         }),
         switchMap((task) => this.getAssetsInfo(task)),
         switchMap(() => this.selectAssets()),
+        switchMap(() => this.uploadTask()),
     ).subscribe((res) => {
         if (res) {
             console.log('Finish', res);
@@ -252,16 +278,104 @@ export class InternalPostComponent implements OnInit {
         sessionData.set('Selected Assets', selectedAssetsData);
         return sessionData;
     });
-    return of(null);
+    // Update status of workflow
+    this.updateWorkflowStatus('SELECT_ASSETS', WorkflowStatus.DONE);
+    return of(true);
   }
+
+  private uploadTask() {
+  
+   console.log('Upload task', this._taskUploader);
+   // Update status of workflow
+   this.updateWorkflowStatus('UPLOAD_ASSETS', WorkflowStatus.DOING);
+   if (!this._taskUploader) {
+    console.error('Task uploader not found');
+    this.updateWorkflowStatus('UPLOAD_ASSETS', WorkflowStatus.ERROR);
+    return of(null);
+    }
+   return from(this._taskUploader.start(this.activeTask()?.taskId || ''));
+  }
+
+  private async getFilesToUpload(taskId: string) {
+    // find task in taskList
+    const task = this.taskList().find((t) => t.taskId === taskId);
+    if (!task) {
+      console.error('Task not found', taskId);
+      return Promise.resolve(null);
+    }
+    const result: GetFilesToUploadResponse = {
+      taskId: taskId,
+      clientId: task.clientId,
+      files: [],
+    };
+    // check has task detail
+    let taskDetail: InternalPostTask | null = this.activeTask();
+    if (taskDetail?.taskId !== taskId) {
+        // get task detail
+        const res = await firstValueFrom(this.cfApiService.getTaskDetail([taskId]));
+        if (!res || !res.data || res.metadata.code !== 'GEN-0') {
+            console.error('Task detail not found', taskId);
+            return Promise.resolve(null);
+        }
+        taskDetail = new InternalPostTask(res.data[0]);
+    }
+
+    // Get expected output name
+    const res = await firstValueFrom(this.cfApiService.getTaskExpectedOutputName(taskId));
+    if (!res || !res.data || res.metadata.code !== 'GEN-0') {
+        console.error('Expected output name not found', taskId);
+        return Promise.resolve(null);
+    }
+    const expectedOutputNameResult = res.data as Record<string, Array<{
+        expectedOutputFilename: string;
+        specId?: string;
+    }>>;
+    console.log('Expected output name', expectedOutputNameResult);
+
+    console.warn('[Uploader] Mock upload file local path', `/Volumes/DATA/haht/Images/Auto transfer 2/Transfer203.jpg` );
+    for (const assetLifeCycle of taskDetail?.assetLifeCycles || []) {
+        const expectedOutputNameData = expectedOutputNameResult[assetLifeCycle.assetLifeCycleId];
+
+        if (!assetLifeCycle.cfAssetFile) {
+            continue;
+        }
+        // No output spec
+        if(assetLifeCycle.outputSpecs.length === 0) {
+            for (const asset of assetLifeCycle.cfAssetFile) {
+                result.files.push({
+                    localId: asset.assetId,
+                localPath: `/Volumes/DATA/haht/Images/Auto transfer 2/Transfer203.jpg`,
+                expectedOutputName: expectedOutputNameData[0].expectedOutputFilename,
+            }) ;}
+        }
+        // Has output spec
+        for (const spec of assetLifeCycle.outputSpecs) {
+            const expectedOutputFilename = expectedOutputNameData.find((e) => e.specId === spec.specId);
+            
+            result.files.push({
+                localId: spec.specId,
+                localPath: `/Volumes/DATA/haht/Images/Auto transfer 2/Transfer203.jpg`,
+                expectedOutputName: expectedOutputFilename?.expectedOutputFilename + '.jpg',
+            });
+        }
+    }
+    return Promise.resolve(result);
+  }
+
+
+  private async getPresignedUrl(payload: any) {
+    console.log('[Uploader] Get presigned url', payload);
+    const res = await firstValueFrom(this.cfApiService.getAssetPresignedUrl(payload));
+    if (!res || !res.data || res.metadata.code !== 'GEN-0') {
+        console.error('Error get asset presigned url', res);
+        return Promise.resolve(null);
+    }
+    return Promise.resolve(res.data as GetPresignedUrlResult<PresignedUrlAssetFile, PresignedUrlErrorAssetFile>);
+  }
+
+
 
 
   
-  get objectKeys() {
-    return Object.keys;
-  }
 
-  get sessionKeys(): string[] {
-    return Array.from(this.sessionData().keys());
-  }
 }

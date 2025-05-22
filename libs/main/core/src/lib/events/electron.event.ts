@@ -2,6 +2,7 @@ import { ipcMain } from 'electron';
 import { API_EVENTS } from '@creative-force/electron-core/preload';
 import { Application } from '../static/application';
 import { NetService } from '../net-service';
+import { FileSystemUtils } from '../utils/file-system';
 
 export const bootstrapElectronEvents = () => {
   return true;
@@ -44,3 +45,10 @@ ipcMain.handle(API_EVENTS.NET_SERVICE.STOP, (_, service: string) => {
 ipcMain.handle(API_EVENTS.NET_SERVICE.TEST_UPLOAD, () => {
   return NetService.testUpload();
 });
+
+// File system
+ipcMain.handle(API_EVENTS.FILE_SYSTEM.GET_FILE_INFO, (_, paths: string[]) => {
+  return FileSystemUtils.getBatchFilesInfo(paths);
+});
+
+

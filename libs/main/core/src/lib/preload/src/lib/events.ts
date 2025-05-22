@@ -13,4 +13,8 @@ export const API_EVENTS = {
 
     TEST_UPLOAD: 'netServiceTestUpload',
   },
+  FILE_SYSTEM: {
+    GET_FILE_INFO: 'fileSystemGetFileInfo',
+    GET_FILE_SIZE: 'fileSystemGetFileSize',
+  },
 };

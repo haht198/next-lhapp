@@ -5,6 +5,7 @@ import { join } from 'path';
 import { format } from 'url';
 import { bootstrapApplication } from '@creative-force/electron-core';
 import { Application } from '@creative-force/electron-core';
+import { Uploader } from '@creative-force/electron-uploader/main';
 export default class App {
   // Keep a global reference of the window object, if you don't, the window will
   // be closed automatically when the JavaScript object is garbage collected.
@@ -45,14 +46,24 @@ export default class App {
     // This method will be called when Electron has finished
     // initialization and is ready to create browser windows.
     // Some APIs can only be used after this event occurs.
-    if (rendererAppName) {
-      bootstrapApplication({
-        appName: rendererAppName,
-        appPort: rendererAppPort,
-      });
+   
       App.initMainWindow();
       App.loadMainWindow();
       Application.setMainWindow(App.mainWindow);
+      if (rendererAppName) {
+        bootstrapApplication({
+          appName: rendererAppName,
+          modules: [
+            {   
+              bootstrap: () => { 
+                console.log('bootstrap uploader',  App.mainWindow);
+                Uploader.bootstrap({
+                  webContent: App.mainWindow?.webContents,
+                });
+               }
+            },
+          ],
+        });
     }
   }
 
