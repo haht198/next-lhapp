@@ -16,5 +16,7 @@ namespace Common.Services
 
         public static string FinishUpload => "upload-finished";
 
+        public static string UploadProgress => "upload-progress";
+
     }
 }
