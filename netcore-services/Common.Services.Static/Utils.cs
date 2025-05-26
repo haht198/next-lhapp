@@ -16,8 +16,8 @@ namespace Common.Services.Static
         private static readonly Random Random = new Random();
         private static readonly DateTime MinJsTime = new(1970, 1, 1, 0, 0, 0);
         private static HttpClient _httpClientCheckConnection;
-        private static readonly string UrlCheckConnection = "https://download.creativeforce.io/ping";        
-
+        private static readonly string UrlCheckConnection = "https://download.creativeforce.io/ping";
+        public static bool HasInternetConnection = true;
         public static string Md5Hash(string value)
         {
             using (var md5 = MD5.Create())
@@ -86,54 +86,6 @@ namespace Common.Services.Static
                 }
             }
         }
-
-        public static bool HasInternetConnection()
-        {
-            try
-            {
-                if (_httpClientCheckConnection == null)
-                {
-                    InitHttpClientCheckConnection();
-                }
-
-                if (_httpClientCheckConnection != null)
-                {
-                    var result = _httpClientCheckConnection.GetAsync(UrlCheckConnection).GetAwaiter().GetResult();
-                    if (!result.IsSuccessStatusCode)
-                    {
-                        return false;
-                    }
-                }
-
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
-
-        private static void InitHttpClientCheckConnection()
-        {
-            var handler = new HttpClientHandler();
-            // Bypass invalid certificate 
-            handler.ServerCertificateCustomValidationCallback = AlwaysValidCertificateForRequest;
-            if (ProgramArguments.Proxy != null)
-            {
-                handler.Proxy = ProgramArguments.Proxy;
-                handler.PreAuthenticate = true;
-                handler.UseDefaultCredentials = false;
-            }
-
-            _httpClientCheckConnection = new HttpClient(handler)
-            {
-                Timeout = TimeSpan.FromMinutes(15)
-            };
-            _httpClientCheckConnection.DefaultRequestHeaders.Accept.Clear();
-            _httpClientCheckConnection.DefaultRequestHeaders.Add("Connection", "Keep-Alive");
-            _httpClientCheckConnection.DefaultRequestHeaders.Add("Keep-Alive", "timeout=600");
-        }
-
         public static IEnumerable<string> UnzipFile(string zipFilePath, string extractFolder)
         {
             if (Directory.Exists(extractFolder))
@@ -207,9 +159,9 @@ namespace Common.Services.Static
             }
             return Path.Combine(UserSetting.WorkspaceFolder, "metadata", folderHashed, $"{fileHashed}.videoinfo.kelvin");
         }
-        
+
         public static bool AlwaysValidCertificateForRequest (
-            object sender, 
+            object sender,
             System.Security.Cryptography.X509Certificates.X509Certificate certificate,
             System.Security.Cryptography.X509Certificates.X509Chain chain,
             System.Net.Security.SslPolicyErrors sslPolicyErrors)

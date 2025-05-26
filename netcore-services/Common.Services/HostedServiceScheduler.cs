@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Common.Services.Core;
 using Common.Services.Static;
 using Common.Services.Static.Logger;
+using Common.Services.Static.Socket;
 namespace Common.Services
 {
     public class HostedServiceScheduler<T> : IHostedService
@@ -22,7 +23,8 @@ namespace Common.Services
         {
             Task.Factory.StartNew(() =>
             {
-                var connectResult = SocketIntegration.Init(ProgramArguments.Service);
+                SocketIntegration.Init(ProgramArguments.Service);
+                var connectResult = SocketIntegration.Connect();
                 if (!connectResult)
                 {
                     Logger.Error(
